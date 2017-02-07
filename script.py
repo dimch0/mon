@@ -69,10 +69,8 @@ def write_doc(doc_template, new_doc, info_list):
 def main():
     wb = open_workbook(FOR_AGREEMENT_FILE)
 
-
     for sheet in wb.sheets():
         number_of_rows = sheet.nrows
-        number_of_columns = sheet.ncols
 
         for row in range(1, number_of_rows):
 
