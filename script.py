@@ -1,32 +1,28 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-
-# http://stackoverflow.com/questions/10366596/how-to-read-contents-of-an-table-in-ms-word-file-using-python
-# https://python-docx.readthedocs.io/en/latest/search.html?q=table&check_keywords=yes&area=default
-
-
+import sys
 from docx import Document
 from docx.shared import Pt
 from xlrd import open_workbook
-from docx.enum.style import WD_STYLE_TYPE
 
-FOR_AGREEMENT_FILE = 'for-agreements.xlsx'
-
-
-
-
-DOG_TEMPLATE = "dog.docx"
+FOR_AGREEMENT_FILE = 'MM.xlsx'
+DOG_TEMPLATE = "contract_template.docx"
 DOG_NEW = u"Договор-за-обучение_BG-EN_Appendix-B_HRC-Foundation-002_{0}.docx"
 
-name_bg = "NAME_BG_HERE"
-name_e = "NAME_E_HERE"
-info_1 = u"с ЕГН  NATIONAL_ID_HERE, л. к. ID_CARD_NO_HERE, изд. на ISSUED_ON_HERE от МВР – ISSUED_BY_HERE"
-info_2 = 'ADDRESS_BG_HERE'
-info_3 = "with National ID No. NATIONAL_ID_HERE, personal ID card No. ID_CARD_NO, issued on ISSUED_ON_HERE by the Ministry of Interior - ISSUED_BY_HERE,"
-info_4 = "ADDRESS_E_HERE"
+IDX_NAME_BG = 0
+IDX_NATIONAL_ID = 1
+IDX_ID_CARD_NO = 2
+IDX_ISSUED_ON = 3
+IDX_ISSUED_BY = 4
+IDX_ADDRESS_BG = 5
+IDX_PHONE = 6
+IDX_NAME_E = 7
+IDX_ISSUED_BY_E =8
+IDX_ADDRESS_E = 9
 
 
 def write_doc(doc_template, new_doc, info_list):
+
     doc = Document(doc_template)
     table = doc.tables[0]
 
@@ -35,74 +31,88 @@ def write_doc(doc_template, new_doc, info_list):
     font.size = Pt(11)
     font.name = 'Cambria'
 
-    style2 = doc.styles.add_style('Undefined', WD_STYLE_TYPE.PARAGRAPH)
-    font2 = style2.font
-    font2.size = Pt(11)
-    font2.name = 'Cambria'
+    name_bg_here = info_list[0]
+    name_e_here = info_list[1]
+    info_bg = info_list[2]
+    info_e = info_list[3]
+    adr_bg = info_list[4]
+    adr_e = info_list[5]
 
     for row in table.rows:
         for cell in row.cells:
             for paragraph in cell.paragraphs:
-                if name_bg in paragraph.text:
-                    paragraph.text = paragraph.text.replace(name_bg, "")
-                    paragraph.add_run(info_list[0]).bold = True
+
+                if u"NAME_BG_HERE" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("NAME_BG_HERE", "")
+                    paragraph.add_run(name_bg_here).bold = True
                     paragraph.style = doc.styles['Normal']
-                if name_e in paragraph.text:
-                    paragraph.text = paragraph.text.replace(name_e, "")
-                    paragraph.add_run(info_list[1]).bold = True
+                if u"NAME_E_HERE" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("NAME_E_HERE", "")
+                    paragraph.add_run(name_e_here).bold = True
                     paragraph.style = doc.styles['Normal']
-                if info_1 in paragraph.text:
-                    paragraph.text = paragraph.text.replace(info_1, info_list[2])
-                    paragraph.style = doc.styles['Undefined']
-                if info_2 in paragraph.text:
-                    paragraph.text = paragraph.text.replace(info_2, info_list[3])
-                    paragraph.style = doc.styles['Undefined']
-                if info_3 in paragraph.text:
-                    paragraph.text = paragraph.text.replace(info_3, info_list[4])
-                    paragraph.style = doc.styles['Undefined']
-                if info_4 in paragraph.text:
-                    paragraph.text = paragraph.text.replace(info_4, info_list[5])
-                    paragraph.style = doc.styles['Undefined']
+                if u"INFO_BG" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("INFO_BG", info_bg)
+                    paragraph.style = doc.styles['Normal']
+                if u"INFO_E" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("INFO_E", info_e)
+                    paragraph.style = doc.styles['Normal']
+                if u"ADDRESS_BG" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("ADDRESS_BG", adr_bg)
+                    paragraph.style = doc.styles['Normal']
+                if u"ADDRRES_E" in paragraph.text:
+                    paragraph.text = paragraph.text.replace("ADDRRES_E", adr_e)
+                    paragraph.style = doc.styles['Normal']
+
     doc.save(new_doc)
 
 
+def main():
+    wb = open_workbook(FOR_AGREEMENT_FILE)
 
 
-split_1 = u'Адрес по регистрация'
-split_2 = u'registered address'
+    for sheet in wb.sheets():
+        number_of_rows = sheet.nrows
+        number_of_columns = sheet.ncols
+
+        for row in range(1, number_of_rows):
+
+            NAME_BG = sheet.cell(row,IDX_NAME_BG).value if sheet.cell(row,IDX_NAME_BG).value else ""
+            NATIONAL_ID = str(int(sheet.cell(row,IDX_NATIONAL_ID).value)) if sheet.cell(row,IDX_NATIONAL_ID).value else ""
+            ID_CARD_NO = str(int(sheet.cell(row,IDX_ID_CARD_NO).value)) if sheet.cell(row,IDX_ID_CARD_NO).value else ""
+            ISSUED_ON = str(sheet.cell(row,IDX_ISSUED_ON).value).replace("/", ".").replace(",", ".") if sheet.cell(row,IDX_ISSUED_ON).value else ""
+            ISSUED_BY = sheet.cell(row,IDX_ISSUED_BY).value if sheet.cell(row,IDX_ISSUED_BY).value else ""
+            ADDRESS_BG = sheet.cell(row,IDX_ADDRESS_BG).value if sheet.cell(row,IDX_ADDRESS_BG).value else ""
+            ADDRESS_E = sheet.cell(row,IDX_ADDRESS_E).value if sheet.cell(row,IDX_ADDRESS_E).value else ""
+            PHONE = str(sheet.cell(row,IDX_PHONE).value) if sheet.cell(row,IDX_PHONE).value else ""
+            NAME_E = sheet.cell(row,IDX_NAME_E).value if sheet.cell(row,IDX_NAME_E).value else ""
+            ISSUED_BY_E = sheet.cell(row,IDX_ISSUED_BY_E).value if sheet.cell(row,IDX_ISSUED_BY_E).value else ""
+
+            INFO_BG = u"{national_id}{ID_CARD_NO}{ISSUED_ON}{ISSUED_BY}".format(
+                national_id = u"с ЕГН {0}, ".format(NATIONAL_ID) if NATIONAL_ID else "",
+                ID_CARD_NO = u"л.к. {0}, ".format(ID_CARD_NO) if ID_CARD_NO else "",
+                ISSUED_ON = u"изд. на {0}".format(ISSUED_ON) if ISSUED_ON else "",
+                ISSUED_BY = u" от МВР – {0}".format(ISSUED_BY) if ISSUED_BY else "")
+
+            INFO_E = u"{national_id}{ID_CARD_NO}{ISSUED_ON}{ISSUED_BY}".format(
+                national_id = u"with National ID No. {0}, ".format(NATIONAL_ID) if NATIONAL_ID else "",
+                ID_CARD_NO = u"personal ID card No {0}, ".format(ID_CARD_NO) if ID_CARD_NO else "",
+                ISSUED_ON = u"issued on {0}".format(ISSUED_ON) if ISSUED_ON else "",
+                ISSUED_BY = u" by the Ministry of Interior – {0}".format(ISSUED_BY_E) if ISSUED_BY_E else "")
+
+            ADDRESS_BG = u"Адрес по регистрация: {ADDRESS}{PHONE}".format(
+                ADDRESS = ADDRESS_BG,
+                PHONE = u", тел. {0}".format(PHONE) if PHONE else "")
+            ADDRRESS_E = u"Registered address: {ADDRESS}{PHONE}".format(
+                ADDRESS = ADDRESS_E,
+                PHONE = u", tel. {0}".format(PHONE) if PHONE else "")
+
+            info_list = [NAME_BG, NAME_E, INFO_BG, INFO_E, ADDRESS_BG, ADDRRESS_E]
+
+            new_doc_name = DOG_NEW.format("_".join(NAME_E.split()))
+            print u"Creating document: {0} ...".format(new_doc_name)
+            write_doc(DOG_TEMPLATE, new_doc_name, info_list)
 
 
-wb = open_workbook(FOR_AGREEMENT_FILE)
-
-
-for sheet in wb.sheets():
-    number_of_rows = sheet.nrows
-    number_of_rows = 2
-    number_of_columns = sheet.ncols
-
-    for row in range(1, number_of_rows):
-
-        for col in range(number_of_columns):
-
-            value  = (sheet.cell(row,col).value)
-
-            if col == 0:
-                v = value.split(split_1)
-                name1 = v[0].split(',')[0]
-                info1 = v[0].replace(name1+",", "")
-                info2 = split_1 + v[1]
-                # print "row:", row, "col:", col, "val:", v[0], v[1]
-
-            if col == 1:
-                v2 = value.split(split_2)
-                name2 = v2[0].split(',')[0]
-
-                info3 = v2[0].replace(name2+",", "")
-                info4 = "Registered address" + v2[1]
-
-        info_list = [name1, name2, info1, info2, info3, info4]
-        new_doc_name = DOG_NEW.format("_".join(name2.split()))
-        print new_doc_name
-        write_doc(DOG_TEMPLATE, new_doc_name, info_list)
-
-
+if __name__ == '__main__':
+    main()
+    sys.exit()
