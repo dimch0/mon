@@ -5,7 +5,7 @@ from docx import Document
 from docx.shared import Pt
 from xlrd import open_workbook
 
-FOR_AGREEMENT_FILE = 'MM.xlsx'
+FOR_AGREEMENT_FILE = 'for-agreements.xlsx'
 DOG_TEMPLATE = "contract_template.docx"
 DOG_NEW = u"Договор-за-обучение_BG-EN_Appendix-B_HRC-Foundation-002_{0}.docx"
 
