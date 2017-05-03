@@ -24,7 +24,6 @@ IDX_ADDRESS_E = 9
 def write_doc(doc_template, new_doc, info_list):
 
     doc = Document(doc_template)
-    table = doc.tables[0]
 
     style = doc.styles['Normal']
     font = style.font
@@ -38,30 +37,31 @@ def write_doc(doc_template, new_doc, info_list):
     adr_bg = info_list[4]
     adr_e = info_list[5]
 
-    for row in table.rows:
-        for cell in row.cells:
-            for paragraph in cell.paragraphs:
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
 
-                if u"NAME_BG_HERE" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("NAME_BG_HERE", "")
-                    paragraph.add_run(name_bg_here).bold = True
-                    paragraph.style = doc.styles['Normal']
-                if u"NAME_E_HERE" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("NAME_E_HERE", "")
-                    paragraph.add_run(name_e_here).bold = True
-                    paragraph.style = doc.styles['Normal']
-                if u"INFO_BG" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("INFO_BG", info_bg)
-                    paragraph.style = doc.styles['Normal']
-                if u"INFO_E" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("INFO_E", info_e)
-                    paragraph.style = doc.styles['Normal']
-                if u"ADDRESS_BG" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("ADDRESS_BG", adr_bg)
-                    paragraph.style = doc.styles['Normal']
-                if u"ADDRRES_E" in paragraph.text:
-                    paragraph.text = paragraph.text.replace("ADDRRES_E", adr_e)
-                    paragraph.style = doc.styles['Normal']
+                    if u"NAME_BG_HERE" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("NAME_BG_HERE", "")
+                        paragraph.add_run(name_bg_here).bold = True
+                        paragraph.style = doc.styles['Normal']
+                    if u"NAME_E_HERE" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("NAME_E_HERE", "")
+                        paragraph.add_run(name_e_here).bold = True
+                        paragraph.style = doc.styles['Normal']
+                    if u"INFO_BG" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("INFO_BG", info_bg)
+                        paragraph.style = doc.styles['Normal']
+                    if u"INFO_E" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("INFO_E", info_e)
+                        paragraph.style = doc.styles['Normal']
+                    if u"ADDRESS_BG" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("ADDRESS_BG", adr_bg)
+                        paragraph.style = doc.styles['Normal']
+                    if u"ADDRRES_E" in paragraph.text:
+                        paragraph.text = paragraph.text.replace("ADDRRES_E", adr_e)
+                        paragraph.style = doc.styles['Normal']
 
     doc.save(new_doc)
 
